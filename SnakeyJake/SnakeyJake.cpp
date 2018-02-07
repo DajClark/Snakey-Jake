@@ -7,14 +7,16 @@
 #include <conio.h>
 #include <time.h>  
 #include <list>
+#include "Coordinate.h"
 
 bool gameOver;
 int width;
 int height;
+int gameSpeed = 100000000;
 int x, y, martinX, martinY, score;
 enum eDirection { STOP = 0, LEFT, RIGHT, UP, DOWN};
 eDirection dir;
-std::list<int> tail;
+std::list<Coordinate> tail;
 
 void Setup()
 {
@@ -28,6 +30,19 @@ void Setup()
 	y = height / 2;
 	martinX = rand() % width - 1;
 	martinY = rand() % height - 1;
+}
+
+void correctXY() {
+
+	srand(time(NULL));
+	martinX = rand() % 48 + 1;
+	martinY = rand() % 18 + 1;
+	//printf("a  e  $  t  #  e  t  i  C!\n", martinX, martinY);
+	
+	if (martinX >= 49 || martinY >= 19 || martinX <= 0 || martinY <= 0) {
+		correctXY;
+	}
+
 }
 
 void Draw() 
@@ -49,6 +64,7 @@ void Draw()
 			}
 			else
 			{
+				
 				if (j == x && i == y)
 				{
 					std::cout << "0";
@@ -59,7 +75,17 @@ void Draw()
 				}
 				else
 				{
-					std::cout << " ";
+					bool isBody = false;
+					for (std::list<Coordinate>::iterator it = tail.begin(); it != tail.end(); ++it) {
+						if (j == it->getX() && i == it->getY()) {
+							std::cout << "0";
+							isBody = true;
+						}
+					}
+					if (isBody == false) {
+						std::cout << " ";
+					}
+					
 				}
 			}
 			
@@ -118,36 +144,29 @@ void Logic()
 	{
 		srand(time(NULL)); 
 		score++;
-		martinX = rand() % (width + 2);
-		martinY = rand() % (height + 2);
 		
-		while (martinX >= width - 2 || martinY >= height - 2 || martinX <= 0 || martinY <= 0)
-		{
-			srand(time(NULL));
-			martinX = rand() % (width + 2);
-			martinY = rand() % (height + 2);
-			printf("a  e  $  t  #  e  t  i  C!\n",martinX, martinY);
-		}
-
-
+		correctXY();
+		
+		gameSpeed - 1000;
+	
 	}
 
-	if (x < 1)
+	if (x < 1 || x > width - 1 || y < 1 || y > height - 1)
 	{
-		x += width - 1;
+		gameOver = true;
 	}
-	if (x > width - 1)
+	
+	// Tail Coordinates
+
+	Coordinate headPos = Coordinate(x, y);
+	tail.push_front(headPos);
+	while (tail.size() != score)
 	{
-		x -= width - 1;
+		tail.pop_back();
 	}
-	if (y < 1)
-	{
-		y += height - 1;
-	}
-	if (y > height - 1)
-	{
-		y -= height - 1;
-	}
+
+	
+	
 }
 
 int main()
@@ -157,7 +176,7 @@ int main()
 	while (!gameOver)
 	{
 		i++;
-		if (i == 100000000)
+		if (i == gameSpeed)
 		{
 			Draw();
 			Input();
@@ -169,6 +188,11 @@ int main()
 		}
 
 
+	}
+	while (gameOver)
+	{ 
+		system("cls");
+		std::cout << "Game Over";
 	}
     return 0;
 }
