@@ -35,7 +35,7 @@ void Setup()
 void correctXY() {
 
 	srand(time(NULL));
-	martinX = rand() % 48 + 1;
+	martinX = rand() % 49 + 1;
 	martinY = rand() % 18 + 1;
 	//printf("a  e  $  t  #  e  t  i  C!\n", martinX, martinY);
 	
